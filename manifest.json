@@ -1,0 +1,15 @@
+{
+  "name": "MetalSafeBars",
+  "version_number": "1.0.8",
+  "website_url": "https://example.com/MetalSafeBars",
+  "description": "Readable HP/Shield overlays for Risk of Rain 2 on macOS/CrossOver. Hides nothing by default — draws on top. GUID: me.metalfix.ror2.healthbars",
+  "dependencies": [
+    "bbepis-BepInExPack-5.4.0"
+  ],
+  "author": "metalfix",
+  "categories": [
+    "Client-side",
+    "QoL",
+    "UI"
+  ]
+}
