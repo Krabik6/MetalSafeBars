@@ -35,9 +35,9 @@ namespace MetalSafeBars
             EnsureMaterials();
             ResolveHealthBarType();
 
-            var go = new GameObject("MetalSafeBars_DebugOverlay");
-            DontDestroyOnLoad(go);
-            go.AddComponent<MetalSafeDebugOverlay>();
+            // var go = new GameObject("MetalSafeBars_DebugOverlay");
+// DontDestroyOnLoad(go);
+// go.AddComponent<MetalSafeDebugOverlay>();
 
             StartCoroutine(ScanLoop());
         }
@@ -135,20 +135,22 @@ namespace MetalSafeBars
         }
     }
 
-    internal class MetalSafeDebugOverlay : MonoBehaviour
+/*
+internal class MetalSafeDebugOverlay : MonoBehaviour
+{
+    private void OnGUI()
     {
-        private void OnGUI()
-        {
-            var c = GUI.color;
-            GUI.color = new Color(0f, 0f, 0f, 0.6f);
-            GUI.Box(new Rect(10, 10, 260, 54), GUIContent.none);
-            GUI.color = Color.white;
-            GUI.Label(new Rect(18, 16, 244, 20), "MetalSafeBars ON");
-            int seen = MetalSafeBarsPlugin.Instance ? MetalSafeBarsPlugin.Instance.SeenCount : 0;
-            GUI.Label(new Rect(18, 36, 244, 20), $"Tracked healthbars: {seen}");
-            GUI.color = c;
-        }
+        var c = GUI.color;
+        GUI.color = new Color(0f, 0f, 0f, 0.6f);
+        GUI.Box(new Rect(10, 10, 260, 54), GUIContent.none);
+        GUI.color = Color.white;
+        GUI.Label(new Rect(18, 16, 244, 20), "MetalSafeBars ON");
+        int seen = MetalSafeBarsPlugin.Instance ? MetalSafeBarsPlugin.Instance.SeenCount : 0;
+        GUI.Label(new Rect(18, 36, 244, 20), $"Tracked healthbars: {seen}");
+        GUI.color = c;
     }
+}
+*/
 
     // СТОРОЖ: не рисует свой UI, только чинит материалы/спрайты у нативных картинок
     internal class MetalSafeHealthbarFixer : MonoBehaviour

@@ -1,6 +1,6 @@
 {
   "name": "MacosHealthbarsFix",
-  "version_number": "1.0.25",
+  "version_number": "1.0.27",
   "website_url": "https://github.com/Krabik6/MetalSafeBars.git",
   "description": "Fixes the invisible or partially missing health/shield bars issue that occurs on macOS when running Risk of Rain 2 through CrossOver. This bug is caused by shader/material incompatibility in the Wine environment, which makes parts of the UI fail to render. MetalSafeBars forces safe, always-visible rendering for HP, shield, and barrier bars — keeping their original behavior intact while ensuring full visibility. GUID: me.metalfix.ror2.healthbars",
   "dependencies": [
