@@ -39,7 +39,47 @@ namespace MetalSafeBars
 // DontDestroyOnLoad(go);
 // go.AddComponent<MetalSafeDebugOverlay>();
 
+            InstallHooks();
             StartCoroutine(ScanLoop());
+        }
+
+        // Patch health bars the moment they are created/enabled/redrawn instead of waiting for the scan loop.
+        private void InstallHooks()
+        {
+            if (_healthBarType == null) return;
+            try
+            {
+                var harmony = new HarmonyLib.Harmony("me.metalfix.ror2.healthbars.hooks");
+                var attach = new HarmonyLib.HarmonyMethod(typeof(MetalSafeHooks), nameof(MetalSafeHooks.AttachPostfix));
+                var apply = new HarmonyLib.HarmonyMethod(typeof(MetalSafeHooks), nameof(MetalSafeHooks.ApplyPostfix));
+                foreach (var name in new[] { "Awake", "Start", "OnEnable" })
+                {
+                    var m = HarmonyLib.AccessTools.DeclaredMethod(_healthBarType, name);
+                    if (m != null) { harmony.Patch(m, postfix: attach); Logger.LogInfo($"[MetalSafeBars] Hooked HealthBar.{name}"); }
+                }
+                foreach (var name in new[] { "ApplyBars", "UpdateBarInfos" })
+                {
+                    var m = HarmonyLib.AccessTools.DeclaredMethod(_healthBarType, name);
+                    if (m != null) { harmony.Patch(m, postfix: apply); Logger.LogInfo($"[MetalSafeBars] Hooked HealthBar.{name}"); }
+                }
+            }
+            catch (Exception e) { Logger.LogError(e); }
+        }
+
+        internal void AttachNow(Component comp)
+        {
+            if (!comp) return;
+            var go = comp.gameObject;
+            if (!go) return;
+            if (HasComponentTypeInParents(go, "BossHealthBar")) { _seen.Add(go); return; }
+            var fixer = go.GetComponent<MetalSafeHealthbarFixer>();
+            if (!fixer)
+            {
+                fixer = go.AddComponent<MetalSafeHealthbarFixer>();
+                fixer.Init(go, Logger);
+            }
+            else fixer.PatchOnce(false);
+            _seen.Add(go);
         }
 
         private void ResolveHealthBarType()
@@ -81,7 +121,7 @@ namespace MetalSafeBars
 
         private IEnumerator ScanLoop()
         {
-            var wait = new WaitForSeconds(0.5f);
+            var wait = new WaitForSeconds(2f);
             while (true)
             {
                 try
@@ -216,7 +256,7 @@ internal class MetalSafeDebugOverlay : MonoBehaviour
             }
         }
 
-        private void PatchOnce(bool full)
+        internal void PatchOnce(bool full)
         {
             if (!_root) return;
 
@@ -256,6 +296,30 @@ internal class MetalSafeDebugOverlay : MonoBehaviour
                 }
                 catch { }
             }
+        }
+    }
+}
+
+namespace MetalSafeBars
+{
+    internal static class MetalSafeHooks
+    {
+        public static void AttachPostfix(object __instance)
+        {
+            try { MetalSafeBarsPlugin.Instance?.AttachNow(__instance as Component); } catch { }
+        }
+
+        public static void ApplyPostfix(object __instance)
+        {
+            try
+            {
+                var comp = __instance as Component;
+                if (!comp) return;
+                var fixer = comp.GetComponent<MetalSafeHealthbarFixer>();
+                if (fixer) fixer.PatchOnce(false);
+                else MetalSafeBarsPlugin.Instance?.AttachNow(comp);
+            }
+            catch { }
         }
     }
 }
